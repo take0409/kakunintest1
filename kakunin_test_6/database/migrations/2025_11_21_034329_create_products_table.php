@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique(); // 商品名 (ユニーク制約)
+            $table->text('description')->nullable(); // 説明 (NULL許容)
+            $table->unsignedInteger('price'); // 価格 (符号なし整数)
+            $table->unsignedSmallInteger('stock')->default(0); // 在庫数 (符号なし小整数, デフォルト値0)
+            $table->timestamps(); // created_at と updated_at
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};

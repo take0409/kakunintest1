@@ -1,0 +1,60 @@
+version: '3'
+services:
+    laravel.test:
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '20'
+        image: sail-8.4/app
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+            - '80:80'
+            - '5173:5173'
+        environment:
+            WWWUSER: '501'
+            WWWGROUP: '20'
+            LARAVEL_SAIL: 1
+            ASSET_URL: http://localhost
+            VITE_PORT: 5173
+            DB_CONNECTION: mysql
+            DB_HOST: mysql
+            DB_PORT: 3306
+            DB_DATABASE: laravel
+            DB_USERNAME: sail
+            DB_PASSWORD: password
+            # Other environment variables as needed (e.g., Mailhog, Redis)
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - mysql
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: ''
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: sail
+            MYSQL_PASSWORD: password
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        volumes:
+            - 'sail-mysql:/var/lib/mysql'
+            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+        networks:
+            - sail
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-p"]
+            retries: 3
+            timeout: 5s
+
+networks:
+    sail:
+        driver: bridge
+volumes:
+    sail-mysql:
+        driver: local
