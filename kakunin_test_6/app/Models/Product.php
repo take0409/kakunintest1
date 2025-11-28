@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany; // BelongsToManyをインポート
+use App\Models\Season; // 【重要】Seasonモデルを明示的にインポート
 
 class Product extends Model
 {
@@ -11,21 +13,25 @@ class Product extends Model
 
     /**
      * 一括割り当て可能な属性（カラム）を定義します。
-     * ユーザーからの入力で更新を許可するカラムを指定します。
      */
     protected $fillable = [
         'name',
-        'description',
         'price',
         'stock',
+        'description',
+        'image_name', // 画像ファイル名もfillableに追加
     ];
 
     /**
-     * 属性の型キャストを定義します。
-     * データベースから取得した price と stock をPHP側で確実に整数型 (integer) として扱うように設定します。
+     * Season モデルとの多対多リレーションを定義します。
+     * Product は複数の Season に属し、Season は複数の Product に属します。
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    protected $casts = [
-        'price' => 'integer',
-        'stock' => 'integer',
-    ];
+    public function seasons(): BelongsToMany
+    {
+        // 中間テーブル名は慣習的に 'product_season' となります。
+        // Season::class を指定
+        return $this->belongsToMany(Season::class);
+    }
 }

@@ -2,24 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // 追記する行
+        // 以下のSeederを呼び出すように修正します
         $this->call([
-            ProductSeeder::class, // <-- ProductSeederを呼び出す
+            SeasonSeeder::class, // 季節データを先に挿入
+            ProductSeeder::class, // 商品データを挿入
         ]);
-
-        // \App\Models\User::factory(10)->create(); 
     }
 }

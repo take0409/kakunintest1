@@ -19,6 +19,26 @@
             font-size: 16px;
         }
         textarea { resize: vertical; height: 100px; }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
         .btn-submit {
             background-color: #2ecc71;
             color: white;
@@ -73,17 +93,34 @@
                 <input type="number" id="price" name="price" value="{{ old('price') }}" required min="0">
                 @error('price') <p class="error">{{ $message }}</p> @enderror
             </div>
-
-            <div class="form-group">
-                <label for="stock">在庫数 <span style="color: #e74c3c;">(必須)</span></label>
-                <input type="number" id="stock" name="stock" value="{{ old('stock') }}" required min="0">
-                @error('stock') <p class="error">{{ $message }}</p> @enderror
-            </div>
+            
+            {{-- 在庫数の入力フィールドは削除されています --}}
 
             <div class="form-group">
                 <label for="description">商品説明 (任意)</label>
                 <textarea id="description" name="description">{{ old('description') }}</textarea>
                 @error('description') <p class="error">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="form-group">
+                <label>旬の季節 (任意)</label>
+                <div class="checkbox-group">
+                    {{-- $seasons は ProductController@create から渡される全季節データ --}}
+                    @foreach ($seasons as $season)
+                        <label>
+                            <input 
+                                type="checkbox" 
+                                name="seasons[]" 
+                                value="{{ $season->id }}" 
+                                {{-- バリデーションエラーで戻ってきた際に、チェック状態を復元 --}}
+                                {{ in_array($season->id, old('seasons', [])) ? 'checked' : '' }}
+                            >
+                            {{ $season->name }}
+                        </label>
+                    @endforeach
+                </div>
+                @error('seasons') <p class="error">{{ $message }}</p> @enderror
+                @error('seasons.*') <p class="error">{{ $message }}</p> @enderror
             </div>
 
             <button type="submit" class="btn-submit">登録する</button>
